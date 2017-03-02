@@ -12,17 +12,20 @@ buildscript {
 }
 
 plugins {
-    id 'groovy'
-    id 'io.ratpack.ratpack-java' version '1.4.1'
+    id 'maven-publish'
+    id 'io.ratpack.ratpack-java' version '1.4.5'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
-    
+
     // The Spring Cloud Contract plugin relies on
-    // the Spring dependency management plugin to 
+    // the Spring dependency management plugin to
     // resolve the dependency versions.
     id 'io.spring.dependency-management' version '1.0.0.RELEASE'
 }
 
 apply plugin: 'spring-cloud-contract'
+
+group = 'mrhaki.ratpack.pirate.service'
+version = '0.0.2'
 
 repositories {
     jcenter()
