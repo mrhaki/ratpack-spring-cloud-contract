@@ -1,0 +1,70 @@
+buildscript {
+    ext {
+        verifierVersion = '1.0.3.RELEASE'
+    }
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        // We add the Spring Cloud Contract plugin to our build.
+        classpath "org.springframework.cloud:spring-cloud-contract-gradle-plugin:${verifierVersion}"
+    }
+}
+
+plugins {
+    id 'groovy'
+    id 'io.ratpack.ratpack-java' version '1.4.1'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
+    
+    // The Spring Cloud Contract plugin relies on
+    // the Spring dependency management plugin to 
+    // resolve the dependency versions.
+    id 'io.spring.dependency-management' version '1.0.0.RELEASE'
+}
+
+apply plugin: 'spring-cloud-contract'
+
+repositories {
+    jcenter()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:${verifierVersion}"
+    }
+}
+
+dependencies {
+    runtime 'org.slf4j:slf4j-simple:1.7.24'
+
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.9'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'org.spockframework:spock-spring:1.0-groovy-2.4'
+    testCompile 'org.springframework.cloud:spring-cloud-starter-contract-verifier'
+    testCompile 'commons-logging:commons-logging:1.2'
+}
+
+mainClassName = 'mrhaki.sample.PirateApp'
+
+assemble.dependsOn shadowJar
+
+/**************************************************************
+ * Configure Spring Cloud Contract plugin
+ *************************************************************/
+contracts {
+    // Of course we use Spock for the generated specifications.
+    // Default is JUnit.
+    targetFramework = 'Spock'
+
+    // With explicit testMode real HTTP requests are sent
+    // to the application from the specs.
+    // Default is MockMvc for Spring applications.
+    testMode = 'Explicit'
+
+    // Base class with setup for starting the Ratpack
+    // application for the generated specs.
+    baseClassForTests = 'mrhaki.sample.BaseSpec'
+
+    // Package name for generated specifications.
+    basePackageForTests = 'mrhaki.sample'
+}
